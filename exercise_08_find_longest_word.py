@@ -1,30 +1,26 @@
-# Ejercicio 8 - Palabra más larga de un archivo
-
-
 def find_longest_word(filename):
     """
-    Lee el archivo, lo divide en palabras (separadas por cualquier tipo
-    de whitespace) y retorna la palabra más larga.
-
-    Reglas:
-    - Si hay varias palabras con la misma longitud máxima, retornar la
-      PRIMERA en aparecer.
-    - Si el archivo no existe, propagar FileNotFoundError.
-    - Si el archivo no tiene ninguna palabra (está vacío o solo tiene
-      espacios/saltos de línea), lanzar ValueError("file has no words").
-
-    Args:
-        filename: str - nombre del archivo a leer.
-
-    Returns:
-        str - la palabra más larga del archivo.
-
-    Raises:
-        FileNotFoundError: si el archivo no existe.
-        ValueError: si el archivo no tiene palabras.
-
-    Ejemplo:
-        # archivo contiene: "el gato corre rapido\npor el jardin\n"
-        find_longest_word("texto.txt") -> "rapido"
+    Lee un archivo y retorna la palabra más larga.
+    En caso de empate en longitud, retorna la primera aparición.
     """
-    pass  # Reemplazar con tu implementación
+    # 1. Abrimos el archivo. Si no existe, lanza FileNotFoundError.
+    with open(filename, 'r', encoding='utf-8') as file:
+        content = file.read()
+        
+        # 2. Obtenemos todas las palabras (separa por espacios, tabs y \n)
+        words = content.split()
+        
+        # 3. Si no hay palabras, lanzamos ValueError según la consigna
+        if not words:
+            raise ValueError("file has no words")
+            
+        # 4. Buscamos la palabra más larga
+        longest = words[0]
+        
+        for word in words:
+            # Usamos > para que en caso de empate (longitudes iguales)
+            # no reemplace la primera palabra encontrada.
+            if len(word) > len(longest):
+                longest = word
+                
+        return longest

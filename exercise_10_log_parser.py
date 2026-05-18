@@ -1,45 +1,33 @@
-# Ejercicio 10 - Parser de archivos de log
-
-
 def parse_log(filename):
     """
-    Lee un archivo de log donde cada línea tiene el formato:
-
-        NIVEL: mensaje
-
-    y retorna un diccionario donde la clave es el nivel y el valor es una
-    lista con todos los mensajes de ese nivel, en el orden en que aparecen.
-
-    Reglas:
-    - Los niveles no son fijos: cualquier string antes del primer ':'
-      cuenta como nivel. El mensaje es todo lo que viene después del
-      primer ':'.
-    - Aplicar strip al nivel y al mensaje para eliminar espacios sobrantes.
-    - Las líneas vacías (o con solo espacios) se ignoran: NO son inválidas.
-    - Si alguna línea no vacía NO tiene ':', lanzar
-      ValueError("invalid log line").
-    - Si el archivo no existe, propagar FileNotFoundError.
-
-    Args:
-        filename: str - nombre del archivo a leer.
-
-    Returns:
-        dict[str, list[str]] - mensajes agrupados por nivel.
-
-    Raises:
-        FileNotFoundError: si el archivo no existe.
-        ValueError: si alguna línea no vacía no tiene ':'.
-
-    Ejemplo:
-        # archivo contiene:
-        # INFO: servidor iniciado
-        # ERROR: no se puede conectar
-        # INFO: reintentando
-        # WARN: lento
-        parse_log("server.log") -> {
-            "INFO": ["servidor iniciado", "reintentando"],
-            "ERROR": ["no se puede conectar"],
-            "WARN": ["lento"],
-        }
+    Lee un archivo de log y agrupa los mensajes por nivel de severidad.
     """
-    pass  # Reemplazar con tu implementación
+    log_data = {}
+    
+    # 1. Abrimos el archivo. Si no existe, propaga FileNotFoundError automáticamente.
+    with open(filename, 'r', encoding='utf-8') as file:
+        for line in file:
+            # Ignoramos líneas que solo contienen espacios o están vacías
+            clean_line = line.strip()
+            if not clean_line:
+                continue
+            
+            # 2. Verificamos si la línea es válida (debe contener ':')
+            if ':' not in clean_line:
+                raise ValueError("invalid log line")
+            
+            # 3. Dividimos por el PRIMER ':' que aparezca
+            # El parámetro 1 en split garantiza que si el mensaje contiene :, no se rompa
+            level, message = clean_line.split(':', 1)
+            
+            # Limpiamos espacios sobrantes del nivel y del mensaje
+            level = level.strip()
+            message = message.strip()
+            
+            # 4. Agrupamos en el diccionario de listas
+            if level in log_data:
+                log_data[level].append(message)
+            else:
+                log_data[level] = [message]
+                
+    return log_data
